@@ -137,7 +137,40 @@ export default function HomePage() {
           {/* GAME MODE SELECTION */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-center mb-4">🎮 Choose Your Game Style</h2>
-            
+
+            {/* TIME-LOOP MODE - NEW! */}
+            <div className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl p-6 mb-6 text-white">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <div className="text-4xl mb-2">⏰ TIME-LOOP MODE</div>
+                  <h3 className="text-2xl font-bold mb-2">Survive the Week!</h3>
+                  <p className="text-orange-100 mb-4">
+                    Live through a 90-second week, make split-second choices, and learn from your mistakes.
+                    Die and restart? Your knowledge stays. Master the pattern!
+                  </p>
+                  <ul className="space-y-1 text-sm text-orange-100">
+                    <li>✓ Fast-paced decision making (7-second windows)</li>
+                    <li>✓ Learn through repetition & pattern recognition</li>
+                    <li>✓ Visual timeline shows consequences</li>
+                    <li>✓ "One more try" addictive loop</li>
+                    <li>✓ No grinding - pure skill!</li>
+                  </ul>
+                </div>
+                <div className="text-8xl animate-pulse">🔄</div>
+              </div>
+
+              <a
+                href="/game/time-loop"
+                className="block w-full bg-white text-orange-600 text-xl font-bold py-6 px-6 rounded-xl shadow-lg transform hover:scale-105 transition hover:bg-orange-50 text-center"
+              >
+                <div className="text-3xl mb-2">⏱️</div>
+                Start Time-Loop
+                <div className="text-sm font-normal mt-2 text-orange-500">
+                  Pattern recognition • Quick decisions • Infinite retries
+                </div>
+              </a>
+            </div>
+
             {/* PLATFORMER MODE - NEW! */}
             <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-6 mb-6 text-white">
               <div className="flex items-center justify-between mb-4">
