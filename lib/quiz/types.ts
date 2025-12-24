@@ -41,6 +41,7 @@ export interface GameSession {
   lastAnswerCorrect: boolean | null;
   lastExplanation: string;
   isComplete: boolean;
+  level?: number;
 }
 
 export type LifelineType = 'fiftyFifty' | 'skip' | 'askGuru';

@@ -74,12 +74,12 @@ export default function HomePage() {
           <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-8 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-3xl font-bold mb-2">Quiz Mode</h2>
+                <h2 className="text-3xl font-bold mb-2">Level-Based Quiz</h2>
                 <p className="text-blue-100 text-lg">
-                  15 questions • Lifelines • Instant feedback
+                  5 levels • 10 questions each • Progressive difficulty
                 </p>
               </div>
-              <div className="text-6xl">🎯</div>
+              <div className="text-6xl">🗺️</div>
             </div>
           </div>
 
@@ -87,17 +87,17 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
                 <div className="text-3xl mb-3">📊</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Real Scenarios</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">5 Progressive Levels</h3>
                 <p className="text-gray-600">
-                  Face realistic financial decisions covering spending, debt, savings, investing, and mindset.
+                  Start with basics (age 5-6) and progress to real-world scenarios (age 10-12). Each level builds on the last!
                 </p>
               </div>
 
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                <div className="text-3xl mb-3">🎓</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Instant Learning</h3>
+                <div className="text-3xl mb-3">⭐</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Earn Stars to Progress</h3>
                 <p className="text-gray-600">
-                  Get immediate feedback with clear explanations for every answer. Learn why each choice matters.
+                  Get 3 stars to unlock the next level! Score 8/10 or better to earn all three stars.
                 </p>
               </div>
 
@@ -110,19 +110,19 @@ export default function HomePage() {
               </div>
 
               <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                <div className="text-3xl mb-3">📱</div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Mobile Friendly</h3>
+                <div className="text-3xl mb-3">💾</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Track Your Progress</h3>
                 <p className="text-gray-600">
-                  Clean, fast interface. No game engine loading. Pure React performance on any device.
+                  Your stars and best scores are saved automatically. Come back anytime to improve!
                 </p>
               </div>
             </div>
 
             <button
-              onClick={() => router.push('/quiz')}
+              onClick={() => router.push('/levels')}
               className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-black py-6 rounded-2xl text-2xl shadow-lg transition-all transform hover:scale-105"
             >
-              🚀 Start Quiz
+              🗺️ Start Your Journey
             </button>
           </div>
         </div>
@@ -137,9 +137,9 @@ export default function HomePage() {
                 1
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 mb-1">Answer 15 Random Questions</h3>
+                <h3 className="font-bold text-gray-900 mb-1">Choose Your Level</h3>
                 <p className="text-gray-600">
-                  Each quiz draws from a bank of 35+ questions covering all aspects of personal finance.
+                  Start at Level 1 with simple concepts. Each level has 10 questions tailored to different age groups.
                 </p>
               </div>
             </div>
@@ -149,9 +149,9 @@ export default function HomePage() {
                 2
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 mb-1">Earn Points & Build Streaks</h3>
+                <h3 className="font-bold text-gray-900 mb-1">Answer Questions & Earn Stars</h3>
                 <p className="text-gray-600">
-                  Correct answers = 100 points. Consecutive correct answers give you streak bonuses up to 2.5x!
+                  Get 8/10 correct for 3 stars, 6/10 for 2 stars. Only 3 stars unlock the next level!
                 </p>
               </div>
             </div>
@@ -175,9 +175,9 @@ export default function HomePage() {
                 4
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 mb-1">Learn & Improve</h3>
+                <h3 className="font-bold text-gray-900 mb-1">Master All 5 Levels</h3>
                 <p className="text-gray-600">
-                  Every answer includes a short explanation. Play multiple times to master all scenarios.
+                  Progress from basic coin counting to real-world financial decisions. Your journey to financial wisdom!
                 </p>
               </div>
             </div>
