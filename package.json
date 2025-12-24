@@ -12,16 +12,13 @@
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.88.0",
     "next": "16.0.10",
-    "phaser": "^3.90.0",
     "react": "19.2.1",
-    "react-dom": "19.2.1",
-    "seedrandom": "^3.0.5"
+    "react-dom": "19.2.1"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/seedrandom": "^3.0.8",
     "autoprefixer": "^10.4.17",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
