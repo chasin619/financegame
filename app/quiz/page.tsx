@@ -1,23 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { QuizQuestion, GameSession, LifelineType } from '@/lib/quiz/types';
-import { getRandomQuestions } from '@/lib/quiz/questions';
+import { getRandomQuestionsForLevel, MAX_LEVEL } from '@/lib/quiz/levels';
 
-const TOTAL_QUESTIONS = 15;
+const TOTAL_QUESTIONS = 10;
 const POINTS_PER_CORRECT = 100;
 const STREAK_BONUS_PERCENT = 10;
 const MAX_STREAK_MULTIPLIER = 2.5;
 const QUESTION_TIME_SECONDS = 10;
 const BOSS_MULTIPLIER = 2;
 
-export default function QuizPage() {
+function QuizContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const supabase = createClient();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Get level from URL params, default to 1
+  const levelParam = searchParams.get('level');
+  const currentLevel = Math.max(1, Math.min(MAX_LEVEL, parseInt(levelParam || '1', 10) || 1));
 
   const [session, setSession] = useState<GameSession>({
     currentQuestionIndex: 0,
@@ -37,6 +42,7 @@ export default function QuizPage() {
     lastAnswerCorrect: null,
     lastExplanation: '',
     isComplete: false,
+    level: currentLevel,
   });
 
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
@@ -80,10 +86,10 @@ export default function QuizPage() {
   // Initialize game
   useEffect(() => {
     if (isAuthenticated && session.selectedQuestions.length === 0) {
-      const questions = getRandomQuestions(TOTAL_QUESTIONS);
-      setSession(prev => ({ ...prev, selectedQuestions: questions }));
+      const questions = getRandomQuestionsForLevel(currentLevel, TOTAL_QUESTIONS);
+      setSession(prev => ({ ...prev, selectedQuestions: questions, level: currentLevel }));
     }
-  }, [isAuthenticated, session.selectedQuestions.length]);
+  }, [isAuthenticated, session.selectedQuestions.length, currentLevel]);
 
   const currentQuestion = session.selectedQuestions[session.currentQuestionIndex];
 
@@ -291,7 +297,7 @@ export default function QuizPage() {
   };
 
   const handlePlayAgain = () => {
-    const questions = getRandomQuestions(TOTAL_QUESTIONS);
+    const questions = getRandomQuestionsForLevel(currentLevel, TOTAL_QUESTIONS);
     setSession({
       currentQuestionIndex: 0,
       score: 0,
@@ -310,6 +316,7 @@ export default function QuizPage() {
       lastAnswerCorrect: null,
       lastExplanation: '',
       isComplete: false,
+      level: currentLevel,
     });
     setSelectedAnswer(null);
     setShowGuruHint(false);
@@ -354,6 +361,48 @@ export default function QuizPage() {
     const grade = accuracy >= 90 ? 'A' : accuracy >= 80 ? 'B' : accuracy >= 70 ? 'C' : accuracy >= 60 ? 'D' : 'F';
     const gradeColor = accuracy >= 80 ? 'text-green-600' : accuracy >= 60 ? 'text-yellow-600' : 'text-red-600';
 
+    // Calculate stars: 3 stars if >= 8/10, 2 stars if >= 6/10, 1 star otherwise
+    const starsEarned = session.correctAnswers >= 8 ? 3 : session.correctAnswers >= 6 ? 2 : 1;
+    const starsDisplay = '⭐'.repeat(starsEarned) + '☆'.repeat(3 - starsEarned);
+
+    // Save progress to localStorage (only in browser)
+    useEffect(() => {
+      if (typeof window !== 'undefined' && session.isComplete) {
+        try {
+          const unlockedLevel = parseInt(localStorage.getItem('unlockedLevel') || '1', 10);
+          const levelStarsStr = localStorage.getItem('levelStars') || '{}';
+          const bestScoreStr = localStorage.getItem('bestScore') || '{}';
+
+          const levelStars = JSON.parse(levelStarsStr);
+          const bestScore = JSON.parse(bestScoreStr);
+
+          // Update stars for this level (only if better)
+          const previousStars = levelStars[currentLevel] || 0;
+          if (starsEarned > previousStars) {
+            levelStars[currentLevel] = starsEarned;
+            localStorage.setItem('levelStars', JSON.stringify(levelStars));
+          }
+
+          // Update best score for this level
+          const previousBest = bestScore[currentLevel] || 0;
+          if (session.correctAnswers > previousBest) {
+            bestScore[currentLevel] = session.correctAnswers;
+            localStorage.setItem('bestScore', JSON.stringify(bestScore));
+          }
+
+          // Unlock next level if earned 3 stars
+          if (starsEarned === 3 && currentLevel < MAX_LEVEL) {
+            const nextLevel = currentLevel + 1;
+            if (nextLevel > unlockedLevel) {
+              localStorage.setItem('unlockedLevel', String(nextLevel));
+            }
+          }
+        } catch (error) {
+          console.error('Error saving progress:', error);
+        }
+      }
+    }, [session.isComplete, session.correctAnswers, currentLevel, starsEarned]);
+
     // Calculate badges
     const badges = [];
     if (neverIncreasedDebt && debt === 0) {
@@ -375,8 +424,14 @@ export default function QuizPage() {
           <div className="bg-white rounded-3xl shadow-xl p-8 border-2 border-gray-200">
             <div className="text-center mb-8">
               <div className="text-8xl mb-4">🎉</div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-2">Quiz Complete!</h1>
-              <p className="text-gray-600">Great job! Here's how you did:</p>
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">Level {currentLevel} Complete!</h1>
+              <div className="text-5xl mb-3">{starsDisplay}</div>
+              <p className="text-gray-600">
+                {starsEarned === 3 && currentLevel < MAX_LEVEL && 'Perfect! Level ' + (currentLevel + 1) + ' unlocked! 🎊'}
+                {starsEarned === 3 && currentLevel === MAX_LEVEL && 'Perfect score! You mastered all levels! 🎊'}
+                {starsEarned === 2 && 'Great job! Can you get 3 stars?'}
+                {starsEarned === 1 && 'Good try! Practice to get more stars!'}
+              </p>
             </div>
 
             <div className="space-y-6 mb-8">
@@ -431,13 +486,19 @@ export default function QuizPage() {
                 onClick={handlePlayAgain}
                 className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold py-4 rounded-xl text-lg transition-all transform hover:scale-105"
               >
-                🎮 Play Again
+                🎮 Try Again
+              </button>
+              <button
+                onClick={() => router.push('/levels')}
+                className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white font-bold py-4 rounded-xl text-lg transition-all transform hover:scale-105"
+              >
+                🗺️ Back to Levels
               </button>
               <button
                 onClick={() => router.push('/')}
                 className="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl text-lg transition-all"
               >
-                ← Back to Home
+                ← Home
               </button>
             </div>
           </div>
@@ -464,7 +525,10 @@ export default function QuizPage() {
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg p-4 mb-4 border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-800">
+                LEVEL {currentLevel}
+              </div>
               <div className="text-sm font-bold text-gray-700">
                 Question {session.currentQuestionIndex + 1}/{TOTAL_QUESTIONS}
               </div>
@@ -478,7 +542,7 @@ export default function QuizPage() {
               )}
             </div>
             <button
-              onClick={() => router.push('/')}
+              onClick={() => router.push('/levels')}
               className="text-sm bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded-lg font-medium transition-all"
             >
               Exit
@@ -738,5 +802,20 @@ export default function QuizPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function QuizPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">💰</div>
+          <div className="text-2xl font-bold text-gray-800">Loading...</div>
+        </div>
+      </div>
+    }>
+      <QuizContent />
+    </Suspense>
   );
 }
