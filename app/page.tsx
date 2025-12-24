@@ -6,25 +6,23 @@ import { createClient } from '@/lib/supabase/client';
 
 export default function HomePage() {
   const router = useRouter();
-  const [isStarting, setIsStarting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const supabase = createClient();
 
   useEffect(() => {
-    // Check authentication
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (!session) {
         router.push('/login');
         return;
       }
-      
+
       setUser(session.user);
       setIsLoading(false);
     };
-    
+
     checkAuth();
   }, [router, supabase.auth]);
 
@@ -34,243 +32,162 @@ export default function HomePage() {
     router.refresh();
   };
 
-  const startGame = async (mode: 'normal' | 'hard', gameType: 'strategy' | 'platformer') => {
-    setIsStarting(true);
-    
-    try {
-      const response = await fetch('/api/game/start', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode }),
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to start game');
-      }
-      
-      const data = await response.json();
-      
-      // Route to correct game type
-      if (gameType === 'platformer') {
-        router.push(`/game/platformer?runId=${data.runId}`);
-      } else {
-        router.push(`/game/play?runId=${data.runId}`);
-      }
-    } catch (error: any) {
-      console.error('Start game error:', error);
-      alert(error.message || 'Failed to start game. Please try again.');
-      setIsStarting(false);
-    }
-  };
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 flex items-center justify-center">
-        <div className="text-2xl font-bold">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 flex items-center justify-center">
+        <div className="text-2xl font-bold text-gray-800">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-purple-100 p-4">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50 p-4">
       {/* Header with Logout */}
-      <div className="max-w-4xl mx-auto mb-4">
+      <div className="max-w-5xl mx-auto mb-8">
         <div className="flex justify-between items-center">
           <div className="text-sm text-gray-700">
             Logged in as: <span className="font-bold">{user?.email}</span>
           </div>
           <button
             onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all"
           >
             Logout
           </button>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
+        {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-6xl font-bold text-blue-900 mb-4">
-            💰 Financial Life Simulator
+          <div className="text-7xl mb-4">💰</div>
+          <h1 className="text-6xl font-bold text-gray-900 mb-4">
+            Financial Wisdom Quiz
           </h1>
-          <p className="text-2xl text-gray-700">
-            Learn how credit, debt, and financial decisions shape your future
+          <p className="text-2xl text-gray-700 max-w-3xl mx-auto">
+            Test your money smarts with real-world scenarios. Learn the difference between smart choices and costly mistakes.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-2xl p-8 mb-8">
-          <h2 className="text-3xl font-bold text-center mb-6">How It Works</h2>
-          
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <div className="border-2 border-blue-500 rounded-lg p-6">
-              <div className="text-4xl mb-2">👤</div>
-              <h3 className="text-xl font-bold mb-2">You (The Player)</h3>
-              <p className="text-gray-600">
-                Make any decisions you want. Buy things with cash or credit. 
-                Pay minimum or full balance. Learn from consequences.
-              </p>
-            </div>
-            
-            <div className="border-2 border-green-500 rounded-lg p-6">
-              <div className="text-4xl mb-2">🧙</div>
-              <h3 className="text-xl font-bold mb-2">Money Guru</h3>
-              <p className="text-gray-600">
-                Makes disciplined decisions with the SAME income and opportunities. 
-                See how different choices create different outcomes.
-              </p>
+        {/* Main Quiz Card */}
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border-2 border-gray-200 mb-8">
+          <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-8 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-bold mb-2">Quiz Mode</h2>
+                <p className="text-blue-100 text-lg">
+                  15 questions • Lifelines • Instant feedback
+                </p>
+              </div>
+              <div className="text-6xl">🎯</div>
             </div>
           </div>
 
-          <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-6 mb-8">
-            <h3 className="text-xl font-bold mb-3">⚡ Key Facts:</h3>
-            <ul className="space-y-2 text-gray-700">
-              <li>✓ You start at age 16 with your first job ($2,400/month)</li>
-              <li>✓ Play through 5 years (60 months) in about 10 minutes</li>
-              <li>✓ Both you and Guru have identical incomes and offers</li>
-              <li>✓ All differences come from DECISIONS, not luck</li>
-              <li>✓ Learn how credit card interest compounds</li>
-              <li>✓ Understand why minimum payments trap you</li>
-            </ul>
+          <div className="p-8">
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                <div className="text-3xl mb-3">📊</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Real Scenarios</h3>
+                <p className="text-gray-600">
+                  Face realistic financial decisions covering spending, debt, savings, investing, and mindset.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                <div className="text-3xl mb-3">🎓</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Instant Learning</h3>
+                <p className="text-gray-600">
+                  Get immediate feedback with clear explanations for every answer. Learn why each choice matters.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                <div className="text-3xl mb-3">🎮</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Fun Mechanics</h3>
+                <p className="text-gray-600">
+                  Build streaks for bonus points. Use lifelines (50/50, Skip, Ask Guru) when you need help.
+                </p>
+              </div>
+
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                <div className="text-3xl mb-3">📱</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Mobile Friendly</h3>
+                <p className="text-gray-600">
+                  Clean, fast interface. No game engine loading. Pure React performance on any device.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => router.push('/quiz')}
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-black py-6 rounded-2xl text-2xl shadow-lg transition-all transform hover:scale-105"
+            >
+              🚀 Start Quiz
+            </button>
           </div>
+        </div>
 
-          {/* GAME MODE SELECTION */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-center mb-4">🎮 Choose Your Game Style</h2>
+        {/* How It Works */}
+        <div className="bg-white rounded-3xl shadow-xl p-8 border-2 border-gray-200">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-6">How It Works</h2>
 
-            {/* TIME-LOOP MODE - NEW! */}
-            <div className="bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl p-6 mb-6 text-white">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <div className="text-4xl mb-2">⏰ TIME-LOOP MODE</div>
-                  <h3 className="text-2xl font-bold mb-2">Survive the Week!</h3>
-                  <p className="text-orange-100 mb-4">
-                    Live through a 90-second week, make split-second choices, and learn from your mistakes.
-                    Die and restart? Your knowledge stays. Master the pattern!
-                  </p>
-                  <ul className="space-y-1 text-sm text-orange-100">
-                    <li>✓ Fast-paced decision making (7-second windows)</li>
-                    <li>✓ Learn through repetition & pattern recognition</li>
-                    <li>✓ Visual timeline shows consequences</li>
-                    <li>✓ "One more try" addictive loop</li>
-                    <li>✓ No grinding - pure skill!</li>
-                  </ul>
-                </div>
-                <div className="text-8xl animate-pulse">🔄</div>
+          <div className="space-y-4">
+            <div className="flex items-start gap-4">
+              <div className="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+                1
               </div>
-
-              <a
-                href="/game/time-loop"
-                className="block w-full bg-white text-orange-600 text-xl font-bold py-6 px-6 rounded-xl shadow-lg transform hover:scale-105 transition hover:bg-orange-50 text-center"
-              >
-                <div className="text-3xl mb-2">⏱️</div>
-                Start Time-Loop
-                <div className="text-sm font-normal mt-2 text-orange-500">
-                  Pattern recognition • Quick decisions • Infinite retries
-                </div>
-              </a>
-            </div>
-
-            {/* PLATFORMER MODE - NEW! */}
-            <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-6 mb-6 text-white">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <div className="text-4xl mb-2">🎮 PLATFORMER MODE</div>
-                  <h3 className="text-2xl font-bold mb-2">Run, Jump, Learn!</h3>
-                  <p className="text-purple-100 mb-4">
-                    Play a Mario-style game where you learn by DOING! Hit blocks for offers, 
-                    avoid debt ghosts, feel consequences through gameplay.
-                  </p>
-                  <ul className="space-y-1 text-sm text-purple-100">
-                    <li>✓ Interactive 2D platformer</li>
-                    <li>✓ Learn through natural gameplay</li>
-                    <li>✓ Visual feedback (ghosts chase you!)</li>
-                    <li>✓ Perfect for kids 7-14</li>
-                    <li>✓ No boring menus!</li>
-                  </ul>
-                </div>
-                <div className="text-8xl animate-bounce">🕹️</div>
-              </div>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                <button
-                  onClick={() => startGame('normal', 'platformer')}
-                  disabled={isStarting}
-                  className="bg-white text-purple-600 text-xl font-bold py-6 px-6 rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition hover:bg-purple-50"
-                >
-                  <div className="text-3xl mb-2">🌟</div>
-                  Easy Platformer
-                  <div className="text-sm font-normal mt-2 text-purple-500">
-                    Simple lessons, forgiving gameplay
-                  </div>
-                </button>
-                
-                <button
-                  onClick={() => startGame('hard', 'platformer')}
-                  disabled={isStarting}
-                  className="bg-yellow-400 text-purple-900 text-xl font-bold py-6 px-6 rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition hover:bg-yellow-300"
-                >
-                  <div className="text-3xl mb-2">⚡</div>
-                  Challenge Mode
-                  <div className="text-sm font-normal mt-2">
-                    Faster pace, tougher choices
-                  </div>
-                </button>
+              <div>
+                <h3 className="font-bold text-gray-900 mb-1">Answer 15 Random Questions</h3>
+                <p className="text-gray-600">
+                  Each quiz draws from a bank of 35+ questions covering all aspects of personal finance.
+                </p>
               </div>
             </div>
 
-            {/* STRATEGY MODE - ORIGINAL */}
-            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-6 text-white">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <div className="text-4xl mb-2">📊 STRATEGY MODE</div>
-                  <h3 className="text-2xl font-bold mb-2">Turn-Based Decisions</h3>
-                  <p className="text-blue-100 mb-4">
-                    Classic menu-based game. Make careful choices each month, 
-                    compare with the Guru, see detailed stats.
-                  </p>
-                  <ul className="space-y-1 text-sm text-blue-100">
-                    <li>✓ Detailed financial stats</li>
-                    <li>✓ Compare with Money Guru</li>
-                    <li>✓ Perfect for older teens/adults</li>
-                    <li>✓ Deep analysis available</li>
-                  </ul>
-                </div>
-                <div className="text-8xl">🧠</div>
+            <div className="flex items-start gap-4">
+              <div className="bg-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+                2
               </div>
-              
-              <div className="grid md:grid-cols-2 gap-4">
-                <button
-                  onClick={() => startGame('normal', 'strategy')}
-                  disabled={isStarting}
-                  className="bg-white text-blue-600 text-xl font-bold py-6 px-6 rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition hover:bg-blue-50"
-                >
-                  <div className="text-3xl mb-2">🎮</div>
-                  Normal Strategy
-                  <div className="text-sm font-normal mt-2 text-blue-500">
-                    Gentle learning curve, clear lessons
-                  </div>
-                </button>
-                
-                <button
-                  onClick={() => startGame('hard', 'strategy')}
-                  disabled={isStarting}
-                  className="bg-red-500 text-white text-xl font-bold py-6 px-6 rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition hover:bg-red-600"
-                >
-                  <div className="text-3xl mb-2">🔥</div>
-                  Hard Strategy
-                  <div className="text-sm font-normal mt-2">
-                    Unexpected expenses, tougher decisions
-                  </div>
-                </button>
+              <div>
+                <h3 className="font-bold text-gray-900 mb-1">Earn Points & Build Streaks</h3>
+                <p className="text-gray-600">
+                  Correct answers = 100 points. Consecutive correct answers give you streak bonuses up to 2.5x!
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+                3
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 mb-1">Use Strategic Lifelines</h3>
+                <p className="text-gray-600">
+                  <span className="font-bold">50/50:</span> Remove 2 wrong answers.
+                  <span className="font-bold ml-3">Skip:</span> Move to next question.
+                  <span className="font-bold ml-3">Ask Guru:</span> Get a helpful hint.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div className="bg-yellow-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+                4
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 mb-1">Learn & Improve</h3>
+                <p className="text-gray-600">
+                  Every answer includes a short explanation. Play multiple times to master all scenarios.
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="text-center text-gray-600">
-          <p className="mb-2">This game teaches real financial concepts in a safe environment.</p>
-          <p>All money and decisions are simulated - no real financial risk!</p>
+        {/* Footer */}
+        <div className="text-center text-gray-600 mt-8">
+          <p className="mb-2">This quiz teaches real financial concepts through scenario-based learning.</p>
+          <p>All scenarios are educational - no real money involved!</p>
         </div>
       </div>
     </div>
