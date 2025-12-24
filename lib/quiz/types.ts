@@ -7,6 +7,12 @@ export interface QuizAnswer {
   isCorrect: boolean;
   explanationShort: string;
   impactTag?: string;
+  grade: 'best' | 'ok' | 'bad';
+  impact?: {
+    wallet?: number;
+    debt?: number;
+    stress?: number;
+  };
 }
 
 export interface QuizQuestion {
