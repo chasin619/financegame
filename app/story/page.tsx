@@ -46,6 +46,22 @@ function StoryContent() {
     checkAuth();
   }, [router, supabase.auth]);
 
+  // Reset story when chapter/story index changes
+  useEffect(() => {
+    setStory(null);
+    setGameState({
+      currentChapter,
+      currentStory: currentStoryIndex,
+      currentMoment: 0,
+      coins: 5,
+      mood: 'calm',
+      choiceHistory: [],
+      showFeedback: false,
+      lastChoice: null,
+      isStoryComplete: false,
+    });
+  }, [currentChapter, currentStoryIndex]);
+
   // Load story (with shuffled choices)
   useEffect(() => {
     if (isAuthenticated && !story) {
